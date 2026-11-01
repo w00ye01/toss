@@ -1,6 +1,6 @@
 # agentready
 
-[![CI](https://github.com/w00ye01/agentready/actions/workflows/ci.yml/badge.svg)](https://github.com/w00ye01/agentready/actions/workflows/ci.yml)
+[![agentready](https://github.com/w00ye01/toss/actions/workflows/agentready.yml/badge.svg)](https://github.com/w00ye01/toss/actions/workflows/agentready.yml)
 ![node](https://img.shields.io/badge/node-%3E%3D20-339933)
 ![deps](https://img.shields.io/badge/runtime%20deps-0-blue)
 ![license](https://img.shields.io/badge/license-MIT-lightgrey)
@@ -15,7 +15,7 @@ Claude Code, Codex, Cursor 같은 에이전트는 사람처럼 눈치로 알아�
 비어 있는 부분은 바로 채울 수 있도록 `AGENTS.md` 초안을 만들어 줍니다.
 
 ```text
-$ npx @w00ye01/agentready
+$ agentready
 . (node)
 
   ✖ README                  No README found.
@@ -37,29 +37,22 @@ $ npx @w00ye01/agentready
 ```
 
 ↑ 이 저장소를 처음 만들었을 때 자기 자신을 점검한 결과입니다. `agentready init`으로 AGENTS.md를 만들고 나머지를
-채운 지금은 **100/100**이고, CI가 매 커밋마다 이 점수를 확인합니다([dogfood job](.github/workflows/ci.yml)).
+채운 지금은 **100/100**이고, CI가 매 커밋마다 이 점수를 확인합니다([dogfood job](../.github/workflows/agentready.yml)).
 
 ## 설치
 
 Node.js 20 이상이 필요합니다. 런타임 의존성은 없습니다.
 
 ```sh
-# 설치 없이 바로 실행
-npx @w00ye01/agentready
-
-# 또는 전역 설치 (명령어는 agentready)
-npm install -g @w00ye01/agentready
-```
-
-소스에서 직접 빌드하려면:
-
-```sh
-git clone https://github.com/w00ye01/agentready.git
-cd agentready
+git clone https://github.com/w00ye01/toss.git
+cd toss/agentready
 npm ci
 npm run build
-node dist/cli.js --help
+npm link          # 이후 어디서든 `agentready` 명령 사용
+agentready --help
 ```
+
+> npm 배포(`@w00ye01/agentready`)는 준비 중입니다. 배포 후에는 `npx @w00ye01/agentready`로 설치 없이 실행할 수 있습니다.
 
 ## 사용법
 
@@ -166,6 +159,7 @@ src/
 
 - **체크는 순수 함수**입니다. 파일 시스템에 직접 접근하지 않고 `RepoContext`만 읽기 때문에, 테스트에서 임시
   fixture 저장소를 만들어 바로 검증할 수 있습니다. 체크 하나가 예외를 던져도 전체 리포트는 깨지지 않고 그 항목만 `fail`로 표시됩니다.
+- **모노레포를 인식**합니다. 패키지 안에 CI가 없으면 git 루트의 워크플로 중 이 패키지 경로를 언급하는 것만 찾아서, 형제 패키지용 CI를 잘못 세지 않습니다. (이 저장소가 바로 그 구조입니다.)
 - **스캔은 한 번만** 합니다. `node_modules`, `dist`, `.venv` 같은 디렉터리는 건너뛰고, 깊이와 파일 수에 상한을
   둬서 큰 모노레포에서도 빠르게 끝납니다.
 - **CLI는 얇게** 만들었습니다. `run(argv, io)`가 종료 코드를 반환하는 순수한 형태라서, 프로세스를 띄우지 않고도
@@ -184,7 +178,7 @@ npm run typecheck   # tsc --noEmit
 npm run build       # dist/ 로 컴파일
 ```
 
-CI는 Ubuntu, Windows, macOS × Node 20, 22 매트릭스로 lint → typecheck → test → build를 돌리고, 마지막에 빌드한
+CI([`agentready.yml`](../.github/workflows/agentready.yml))는 Ubuntu, Windows, macOS × Node 20, 22 매트릭스로 lint → typecheck → test → build를 돌리고, 마지막에 빌드한
 CLI로 이 저장소 자체를 `--min-score 90` 기준으로 점검합니다.
 
 새 점검 항목을 추가하는 방법은 [AGENTS.md](AGENTS.md#adding-a-check)에 있습니다.

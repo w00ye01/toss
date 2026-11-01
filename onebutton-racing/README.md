@@ -1,6 +1,6 @@
 # ONE-BUTTON RACING
 
-[![Build](https://github.com/w00ye01/onebutton-racing/actions/workflows/build.yml/badge.svg)](https://github.com/w00ye01/onebutton-racing/actions/workflows/build.yml)
+[![onebutton-racing](https://github.com/w00ye01/toss/actions/workflows/onebutton-racing.yml/badge.svg)](https://github.com/w00ye01/toss/actions/workflows/onebutton-racing.yml)
 ![size](https://img.shields.io/badge/racer.exe-%E2%89%A4%201.44MB-success)
 ![lang](https://img.shields.io/badge/C99-raylib%205.5-blue)
 
@@ -25,12 +25,12 @@ Windows 실행파일 하나가 **플로피 디스크 한 장(1,474,560바이트)
 안전하게 가운데로 통과하면 콤보가 끊기기 때문에, 게이트마다 "멀리 가기"와 "붙여서 점수 따기" 중 하나를
 골라야 합니다. 원버튼 게임에서 선택지를 만드는 게 설계 목표였습니다.
 
-## 다운로드
+## 다운로드 및 실행
 
-[Releases](https://github.com/w00ye01/onebutton-racing/releases)에서 `racer.exe`를 받아 실행하면 됩니다.
+[Releases](https://github.com/w00ye01/toss/releases)에서 `racer.exe`를 받아 실행하면 됩니다.
 설치는 필요 없습니다. 서명이 없는 exe라 SmartScreen 경고가 뜨면 **추가 정보 → 실행**을 누르세요.
 
-최신 커밋으로 빌드한 exe는 [Actions](https://github.com/w00ye01/onebutton-racing/actions) 실행 결과의
+최신 커밋으로 빌드한 exe는 [Actions](https://github.com/w00ye01/toss/actions/workflows/onebutton-racing.yml) 실행 결과의
 `racer-windows` 아티팩트에서도 받을 수 있습니다.
 
 ## 1.44MB에 맞춘 방법
@@ -78,7 +78,7 @@ pacman -S mingw-w64-ucrt-x86_64-gcc make
 scripts/build.sh
 ```
 
-결과물은 `build/racer.exe`에 생깁니다. 게임 코드만 고쳤을 때는 `scripts/build.sh game`으로 raylib 재빌드 없이 다시 빌드할 수 있습니다.
+아래 명령은 모두 `onebutton-racing/` 폴더에서 실행합니다. 결과물은 `build/racer.exe`에 생깁니다. 게임 코드만 고쳤을 때는 `scripts/build.sh game`으로 raylib 재빌드 없이 다시 빌드할 수 있습니다.
 
 맥에서 바로 플레이해보려면 (Homebrew raylib 사용):
 
@@ -92,7 +92,7 @@ cc src/onebutton_racer.c -o racer -Os -I/opt/homebrew/include -L/opt/homebrew/li
 
 ## 자동 검증 (CI)
 
-[`build.yml`](.github/workflows/build.yml)이 커밋할 때마다 공모전 제출 조건을 자동으로 확인합니다.
+[`onebutton-racing.yml`](../.github/workflows/onebutton-racing.yml)이 커밋할 때마다 공모전 제출 조건을 자동으로 확인합니다.
 하나라도 깨지면 빌드가 실패합니다.
 
 | 검사 | 기준 |
@@ -102,7 +102,7 @@ cc src/onebutton_racer.c -o racer -Os -I/opt/homebrew/include -L/opt/homebrew/li
 | 서브시스템 | Windows GUI (콘솔창 안 뜸) |
 | 의존성 | 시스템 DLL만 참조 (`libgcc_s`, `libwinpthread` 등이 있으면 실패) |
 
-검사를 통과한 exe는 아티팩트로 올라가고, `v*` 태그를 푸시하면 Release에 자동으로 첨부됩니다.
+검사를 통과한 exe는 아티팩트로 올라가고, `racer-v*` 태그를 푸시하면 Release에 자동으로 첨부됩니다.
 
 ## 구조
 
@@ -111,6 +111,7 @@ src/onebutton_racer.c   게임 전체 (C99, 단일 파일)
 scripts/build.sh        크로스컴파일 + 용량/의존성 검증 (로컬과 CI가 같은 스크립트 사용)
 docs/BUILD_NOTES.md     Windows 빌드와 용량 최적화 기록
 docs/DEVLOG.md          개발 과정 전체 기록
+AGENTS.md               AI 코딩 에이전트용 작업 규칙 (용량 제약 등)
 ```
 
 ## 개발 과정

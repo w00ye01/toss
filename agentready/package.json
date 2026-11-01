@@ -47,9 +47,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/w00ye01/agentready.git"
+    "url": "git+https://github.com/w00ye01/toss.git",
+    "directory": "agentready"
   },
-  "homepage": "https://github.com/w00ye01/agentready#readme",
+  "homepage": "https://github.com/w00ye01/toss/tree/main/agentready#readme",
   "publishConfig": {
     "access": "public"
   }
