@@ -7,6 +7,7 @@ on:
     tags: ["racer-v*"]
   pull_request:
     paths: ["onebutton-racing/**", ".github/workflows/onebutton-racing.yml"]
+  workflow_dispatch:   # Actions 탭에서 수동 실행
 
 permissions:
   contents: write   # racer-v* 태그 푸시 시 Release에 racer.exe 첨부

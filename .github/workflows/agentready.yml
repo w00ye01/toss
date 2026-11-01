@@ -6,6 +6,7 @@ on:
     paths: ["agentready/**", ".github/workflows/agentready.yml"]
   pull_request:
     paths: ["agentready/**", ".github/workflows/agentready.yml"]
+  workflow_dispatch:   # Actions 탭에서 수동 실행
 
 permissions:
   contents: read
