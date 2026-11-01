@@ -1,8 +1,8 @@
 import type { Check } from "../types.js";
 import { agentDocs, docsText, findTopLevel, runCommand, script } from "../util.js";
 
-const SETUP_HEADING = /^#{1,3}\s*.*(install|setup|getting started|quick ?start|설치|시작)/im;
-const USAGE_HEADING = /^#{1,3}\s*.*(usage|example|how to|사용|예시)/im;
+const SETUP_HEADING = /^#{1,3}\s*.*(install|setup|build|getting started|quick ?start|설치|빌드|시작)/im;
+const USAGE_HEADING = /^#{1,3}\s*.*(usage|example|how to|run|play|사용|예시|실행|플레이)/im;
 
 export const readme: Check = {
   id: "readme",

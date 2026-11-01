@@ -1,3 +1,4 @@
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { agentInstructions, commandsDocumented, readme } from "../src/checks/docs.js";
 import { gitignore, license, lockfile } from "../src/checks/hygiene.js";
@@ -17,6 +18,9 @@ describe("readme", () => {
   });
   it("accepts Korean headings and lowercase file names", () => {
     expect(statusOf(readme, { "readme.md": `# x\n## 설치\n## 사용법\n${"내용 ".repeat(120)}` })).toBe("pass");
+  });
+  it("treats Build/Run headings as setup/usage", () => {
+    expect(statusOf(readme, { "README.md": `# x\n## 빌드\n## 실행\n${"내용 ".repeat(120)}` })).toBe("pass");
   });
   it("passes a complete README", () => {
     expect(statusOf(readme, { "README.md": GOOD_README })).toBe("pass");
@@ -78,6 +82,27 @@ describe("ci", () => {
   it("passes when a workflow runs tests", () => {
     expect(statusOf(ci, { ".github/workflows/ci.yaml": "run: pytest -q" })).toBe("pass");
   });
+
+  describe("monorepo package", () => {
+    const pkgCi = (workflow: string) => {
+      const root = fixture({
+        ".git/HEAD": "ref: refs/heads/main",
+        ".github/workflows/ci.yml": workflow,
+        "packages/cli/package.json": "{}",
+      });
+      return ci.run(createContext(join(root, "packages/cli")));
+    };
+
+    it("finds CI at the git root when it targets this package", () => {
+      const outcome = pkgCi("defaults:\n  run:\n    working-directory: packages/cli\nsteps:\n  - run: npm test");
+      expect(outcome.status).toBe("pass");
+      expect(outcome.detail).toContain("../../.github/workflows/ci.yml");
+    });
+
+    it("ignores root CI that only builds a sibling package", () => {
+      expect(pkgCi("working-directory: packages/web\nrun: npm test").status).toBe("fail");
+    });
+  });
 });
 
 describe("lint", () => {
@@ -89,6 +114,10 @@ describe("lint", () => {
   });
   it("fails without configuration", () => {
     expect(statusOf(lint, { "package.json": "{}" })).toBe("fail");
+  });
+  it("accepts -Werror in a C build script", () => {
+    expect(statusOf(lint, { "main.c": "", "scripts/build.sh": "gcc -Wall -Werror main.c" })).toBe("pass");
+    expect(statusOf(lint, { "main.c": "", "scripts/build.sh": "gcc -Wall main.c" })).toBe("fail");
   });
 });
 

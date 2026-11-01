@@ -1,3 +1,4 @@
+import { isCiFile } from "../context.js";
 import type { Check, RepoContext } from "../types.js";
 import { findTopLevel, hasFile, script } from "../util.js";
 
@@ -62,13 +63,7 @@ export const ci: Check = {
   title: "Continuous integration",
   weight: 15,
   run(ctx) {
-    const workflows = ctx.files.filter(
-      (f) =>
-        /^\.github\/workflows\/[^/]+\.ya?ml$/.test(f) ||
-        f === ".gitlab-ci.yml" ||
-        f === ".circleci/config.yml" ||
-        f === "azure-pipelines.yml",
-    );
+    const workflows = [...ctx.files.filter(isCiFile), ...ctx.workspaceCiFiles];
     if (workflows.length === 0) {
       return {
         status: "fail",
@@ -104,9 +99,15 @@ export const lint: Check = {
     const pyproject = ctx.read("pyproject.toml") ?? "";
     const inPyproject = ctx.ecosystem === "python" && /\[tool\.(ruff|black|pylint|flake8)/.test(pyproject);
     const lintScript = script(ctx, "lint");
+    const werror =
+      ctx.ecosystem === "c"
+        ? ctx.files.find((f) => /(^|\/)(Makefile|CMakeLists\.txt|[^/]+\.sh)$/.test(f) && /-Werror\b/.test(ctx.read(f) ?? ""))
+        : undefined;
 
-    if (config !== undefined || inPyproject || lintScript !== undefined) {
-      const where = config ?? (inPyproject ? "pyproject.toml" : "`lint` script");
+    if (config !== undefined || inPyproject || lintScript !== undefined || werror !== undefined) {
+      const where =
+        config ??
+        (inPyproject ? "pyproject.toml" : lintScript !== undefined ? "`lint` script" : `-Werror in ${werror ?? ""}`);
       return { status: "pass", detail: `Configured via ${where}.` };
     }
     return {

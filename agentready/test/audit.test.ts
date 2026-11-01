@@ -63,6 +63,11 @@ describe("generateAgentsMd", () => {
     expect(md).toMatch(/```sh\nnpm run build\nnpm test\nnpm run lint\n```/);
   });
 
+  it("uses scripts/build.sh for a C project without Makefile", () => {
+    const md = generateAgentsMd(createContext(fixture({ "src/game.c": "", "scripts/build.sh": "" })));
+    expect(md).toContain("| Build | `scripts/build.sh` |");
+  });
+
   it("leaves TODOs when nothing can be inferred", () => {
     const md = generateAgentsMd(createContext(fixture({ "notes.txt": "" })));
     expect(md).toContain("_TODO: list the commands");

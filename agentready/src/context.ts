@@ -1,5 +1,5 @@
-import { readdirSync, readFileSync, statSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { dirname, join, relative, resolve, sep } from "node:path";
 import type { Ecosystem, PackageJson, PackageManager, RepoContext } from "./types.js";
 
 const IGNORED_DIRS = new Set([
@@ -85,6 +85,44 @@ function parsePackageJson(raw: string | undefined): PackageJson | undefined {
   }
 }
 
+/** Nearest ancestor (including `start`) that contains a `.git` entry. */
+export function findGitRoot(start: string): string | undefined {
+  let dir = resolve(start);
+  for (;;) {
+    if (existsSync(join(dir, ".git"))) return dir;
+    const parent = dirname(dir);
+    if (parent === dir) return undefined;
+    dir = parent;
+  }
+}
+
+const CI_FILE = /^(\.github\/workflows\/[^/]+\.ya?ml|\.gitlab-ci\.yml|\.circleci\/config\.yml|azure-pipelines\.yml)$/;
+
+export function isCiFile(relativePath: string): boolean {
+  return CI_FILE.test(relativePath);
+}
+
+/**
+ * In a monorepo, CI lives at the git root rather than inside the package. Return those CI
+ * files (relative to `root`) that reference the package directory, so a workflow for a
+ * sibling package doesn't count.
+ */
+function findWorkspaceCiFiles(root: string): string[] {
+  const gitRoot = findGitRoot(root);
+  if (gitRoot === undefined || gitRoot === root) return [];
+  const packageDir = relative(gitRoot, root).split(sep).join("/");
+  return scanFiles(gitRoot, { maxDepth: 2 })
+    .filter(isCiFile)
+    .filter((f) => {
+      try {
+        return readFileSync(join(gitRoot, f), "utf8").includes(packageDir);
+      } catch {
+        return false;
+      }
+    })
+    .map((f) => relative(root, join(gitRoot, f)).split(sep).join("/"));
+}
+
 export function createContext(path: string, options?: ScanOptions): RepoContext {
   const root = resolve(path);
   if (!statSync(root, { throwIfNoEntry: false })?.isDirectory()) {
@@ -107,6 +145,7 @@ export function createContext(path: string, options?: ScanOptions): RepoContext 
   return {
     root,
     files,
+    workspaceCiFiles: findWorkspaceCiFiles(root),
     ecosystem: detectEcosystem(files),
     packageJson: parsePackageJson(read("package.json")),
     packageManager: detectPackageManager(files),

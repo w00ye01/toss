@@ -27,7 +27,8 @@ function scoreTone(score: number): keyof typeof CODES {
 
 function displayPath(root: string, cwd: string): string {
   const rel = relative(cwd, root);
-  return rel === "" ? "." : rel.startsWith("..") ? root : rel;
+  // Different drive on Windows → relative() returns an absolute path; show it as is.
+  return rel === "" ? "." : rel;
 }
 
 export function formatReport(report: Report, style: Style, cwd = process.cwd()): string {

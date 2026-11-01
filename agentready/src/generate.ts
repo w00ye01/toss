@@ -51,7 +51,13 @@ function commands(ctx: RepoContext): CommandRow[] {
       rows.push({ purpose: "Test", command: "pytest" });
       break;
     case "c":
-      rows.push({ purpose: "Build", command: ctx.files.includes("CMakeLists.txt") ? "cmake -B build && cmake --build build" : "make" });
+      if (ctx.files.includes("CMakeLists.txt")) {
+        rows.push({ purpose: "Build", command: "cmake -B build && cmake --build build" });
+      } else if (ctx.files.includes("Makefile")) {
+        rows.push({ purpose: "Build", command: "make" });
+      } else if (ctx.files.includes("scripts/build.sh")) {
+        rows.push({ purpose: "Build", command: "scripts/build.sh" });
+      }
       break;
     case "unknown":
       break;

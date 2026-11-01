@@ -14,6 +14,12 @@ export interface RepoContext {
   readonly root: string;
   /** Relative POSIX paths of every scanned file (depth-limited, ignores vendored dirs). */
   readonly files: readonly string[];
+  /**
+   * CI config that lives above `root` in the enclosing git repository (monorepo packages),
+   * as paths relative to `root` — e.g. `../.github/workflows/ci.yml`. Only files that
+   * mention this package's directory are included.
+   */
+  readonly workspaceCiFiles: readonly string[];
   readonly ecosystem: Ecosystem;
   readonly packageJson: PackageJson | undefined;
   readonly packageManager: PackageManager;
